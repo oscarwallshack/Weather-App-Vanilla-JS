@@ -1,36 +1,17 @@
-// const weatherEL = document.querySelector('.weather');
-
-// function getWeather(url) {
-//     return new Promise((resolve, reject) => {
-//         let weather = fetch(url), {
-//             "method": "GET",
-//             "headers": {
-//             }
-//         })
-//         .then(response => {
-//             console.log(response);
-//         })
-//         .catch(err => {
-//             console.error(err);
-//         });
-// })
-// }
-
-
-// getWeather(url)
-//     .then(console.log(weather))
-
-
-
-
 
 const weather = {
-    city: "warsaw",
+    city: "Warsaw",
     apiKey: "670c47e06a966cc34fbe6ea72f070c9d",
     fetchWeather: async function () {
         const response = await fetch("https://api.openweathermap.org/data/2.5/weather?q=" + this.city + "&units=metric&appid=" + this.apiKey)
-        // .then((data) => console.log(data))
-        return this.displayWeather(await response.json());
+        try {
+            if (!response.ok)
+                throw new Error(response.statusText);
+            return this.displayWeather(await response.json());
+        } catch (error) {
+            console.log(error);
+            document.querySelector(".city").textContent = `City "${this.city}" not found.`;
+        }
     },
 
     displayWeather: function (data) {
@@ -45,11 +26,21 @@ const weather = {
         document.querySelector(".description").textContent = description;
         document.querySelector(".humidity").textContent = `Humidity: ${humidity}%`;
         document.querySelector(".wind").textContent = `Wind speed: ${speed}km/h`;
-
-        console.log(speed)
     }
-
 }
+
+
+document.querySelector('#search_city').addEventListener('click', () => {
+    let city = document.querySelector('#city_input').value;
+    let notif = document.querySelector('.notif');
+    if (city && city != '') {
+        notif.textContent = null;
+        weather.city = city;
+        weather.fetchWeather();
+    } else {
+        notif.textContent = 'Enter city!'
+    }
+})
+
+
 weather.fetchWeather()
-
-
